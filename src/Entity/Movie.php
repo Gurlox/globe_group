@@ -60,6 +60,27 @@ class Movie
      */
     private $rates;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\MovieType", inversedBy="movies")
+     */
+    private $movieType;
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * @ORM\PreUpdate()
+     */
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime();
+    }
+
     public function __construct()
     {
         $this->rates = new ArrayCollection();
@@ -181,6 +202,18 @@ class Movie
                 $rate->setMovie(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMovieType(): ?MovieType
+    {
+        return $this->movieType;
+    }
+
+    public function setMovieType(?MovieType $movieType): self
+    {
+        $this->movieType = $movieType;
 
         return $this;
     }

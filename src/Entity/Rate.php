@@ -42,6 +42,10 @@ class Rate
 
     public function setPoints(int $points): self
     {
+        if ($points < 0 || $points > 10) {
+            throw new \Exception('Invalid value');
+        }
+
         $this->points = $points;
 
         return $this;

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Movie;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -19,32 +20,27 @@ class MovieRepository extends ServiceEntityRepository
         parent::__construct($registry, Movie::class);
     }
 
-    // /**
-    //  * @return Movie[] Returns an array of Movie objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findForPagination(): ?Query
     {
         return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('m.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+            ->select('m.title')
+            ->orderBy('m.createdAt', 'DESC')
+            ->getQuery();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Movie
+    public function findDetails(int $id): ?array
     {
         return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
+            ->select(
+                'm.title, m.description, m.releaseDate, m.duration, mt.name as movie_type,' .
+                'CONCAT(d.firstName, d.lastName) as director, AVG(r.points) as rating'
+            )
+            ->leftJoin('m.director', 'd')
+            ->leftJoin('m.rates', 'r')
+            ->leftJoin('m.movieType', 'mt')
+            ->where('m.id = :id')
+            ->setParameter('id', $id)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getResult();
     }
-    */
 }
