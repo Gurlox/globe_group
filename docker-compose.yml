@@ -1,0 +1,39 @@
+version: '3'
+services:
+  php:
+    build: docker
+    expose:
+      - '9000'
+    depends_on:
+      - mysql
+    volumes:
+      - ./:/var/www/globe_group
+  nginx:
+    image: nginx:1.13.8
+    ports:
+      - 80:80
+    volumes:
+      - ./:/var/www/globe_group
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+  mysql:
+    image: mysql:5.6
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - '8080:80'
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      PMA_ARBITRARY: 1
